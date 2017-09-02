@@ -19,7 +19,7 @@ chatrooms = "@@"
 @itchat.msg_register('Text')
 def text_reply(msg):
 	global flag
-	if msg['FromUserName'] == arex:
+	if msg['FromUserName'] == myFriends:
 		global flag_group
 		if 'help' in msg['Text'].lower():
 			return '\
@@ -105,7 +105,8 @@ def group_reply(msg):
 			return reply
 
 itchat.auto_login(True)
-itchat.get_friends(update=True)
-arex = itchat.search_friends(name=myUserName)[0]["UserName"]
-#print arex
+myFriends = itchat.get_friends()[0]["UserName"]
+#print myFriends
+mySelf = itchat.search_friends(name=myUserName)[0]["UserName"]
+#print mySelf
 itchat.run()
