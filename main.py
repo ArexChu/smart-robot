@@ -2,10 +2,6 @@
 import itchat
 #from tuling import get_response
 from xiaoirobot import get_response
-import sys  
-
-reload(sys)  
-sys.setdefaultencoding('utf8')
 
 flag = 0
 flag_group = 0
@@ -19,9 +15,14 @@ chatrooms = "@@"
 @itchat.msg_register('Text')
 def text_reply(msg):
 	global flag
-	if msg['FromUserName'] == myFriends:
+	if msg['FromUserName'] == mySelf:
 		global flag_group
 		if 'help' in msg['Text'].lower():
+			print('\
+input set friend or chatroom to choose a object\n\
+input enable friend or chatroom to open the robot\n\
+input disable friend or chatroom to close the robot\n\
+input arex to visit my blog')
 			return '\
 input set friend or chatroom to choose a object\n\
 input enable friend or chatroom to open the robot\n\
@@ -32,53 +33,61 @@ input arex to visit my blog'
 				global friends
 				textUserName = msg['Text']
 				otherUserName = textUserName.split(" ")[2]
+				itchat.get_chatrooms(update=True)
 				friends = itchat.search_friends(name=otherUserName)[0]["UserName"]
-				#print friends
+				print("%s is seted" % otherUserName)
+				return (otherUserName + "is seted") 
 			if 'chatroom' in msg['Text'].lower(): 
 				global chatrooms
 				contentUserName = msg['Text']
 				groupUserName = contentUserName.split(" ")[2]
+				itchat.get_chatrooms(update=True)
 				chatrooms = itchat.search_chatrooms(name=groupUserName)[0]["UserName"]
-				#print chatrooms
+				print(chatrooms)
+				print("%s is seted" % groupUserName)
+				return (groupUserName + "is seted") 
 			#reply = get_response(msg['Text'])
-			#print reply
-			return 'object enabled'
+			#print(reply)
 		if 'enable' in msg['Text'].lower(): 
 			if 'friend' in msg['Text'].lower(): 
 				flag = 1
-				return 'robot enabled'
+				print('robot is enabled')
+				return 'robot is enabled'
 			if 'chatroom' in msg['Text'].lower(): 
 				flag_group = 1
-				return 'robot enabled'
+				print('robot is enabled')
+				return 'robot is enabled'
 		if 'disable' in msg['Text'].lower(): 
 			if 'friend' in msg['Text'].lower(): 
 				flag = 0
-				return 'robot disabled'
+				print('robot is disabled')
+				return 'robot is disabled'
 			if 'chatroom' in msg['Text'].lower(): 
 				flag_group = 0
-				return 'robot disabled'
+				print('robot is disabled')
+				return 'robot is disabled'
 	if msg['FromUserName'] == friends:
 		if 'help' in msg['Text'].lower():
-			return '\
+			return u'\
 回复 enable 开启arex机器人\n\
 回复 disable 关闭arex机器人\n\
 回复 arex 浏览我的博客'
 		if 'enable' in msg['Text'].lower(): 
 			flag = 1
-			return 'robot enabled'
+			return 'robot is enabled'
 		if 'disable' in msg['Text'].lower(): 
 			flag = 0
-			return 'robot disabled'
+			return 'robot is disabled'
 		if 'arex' in msg['Text'].lower(): 
 			return 'http://arexchu.github.io'
 		#elif 'picture' in msg['Text'].lower():
 		#	itchat.send('@img@Himalayas.jpg', msg['FromUserName']) # there should be a picture
 		if flag:
-			print '%s: %s' % (msg['Type'], msg['Text']), msg['FromUserName']
-			reply = get_response(msg['Text'])
+			print u'%s: %s' % (msg['Type'], msg['Text']), msg['FromUserName']
+			reply = get_response(msg['Text'].encode("utf-8"))
 			#reply = prefix + reply
-			print reply
-			return reply
+			print(reply)
+			return (reply.decode("utf-8"))
 
 @itchat.msg_register('Text', isGroupChat = True)
 def group_reply(msg):
@@ -86,27 +95,28 @@ def group_reply(msg):
 		if msg['isAt']:
 			global flag_group
 			if 'help' in msg['Text'].lower():
-				return '\
+				return u'\
 回复 enable 同时@我 开启arex机器人\n\
 回复 disable 同时@我 关闭arex机器人\n\
 回复 arex 同时@我浏览我的博客'
 			if 'enable' in msg['Text'].lower(): 
 				flag_group = 1
-				return 'robot enabled'
+				return 'robot is enabled'
 			if 'disable' in msg['Text'].lower(): 
 				flag_group = 0
-				return 'robot disabled'
+				return 'robot is disabled'
 			if 'arex' in msg['Text'].lower(): 
 				return 'http://arexchu.github.io'
 		if flag_group:
-			print '%s: %s' % (msg['ActualNickName'], msg['Content']), msg['FromUserName']
-			reply = get_response(msg['Content'])
-			print reply
-			return reply
+			print u'%s: %s' % (msg['ActualNickName'], msg['Content']), msg['FromUserName']
+			reply = get_response(msg['Content'].encode("utf-8"))
+			print(reply)
+			return (reply.decode("utf-8"))
 
 itchat.auto_login(True)
-myFriends = itchat.get_friends()[0]["UserName"]
-#print myFriends
-mySelf = itchat.search_friends(name=myUserName)[0]["UserName"]
-#print mySelf
+mySelf = itchat.get_friends()[0]["UserName"]
+#print(mySelf)
+itchat.get_friends(update=True)
+myFriends = itchat.search_friends(name=myUserName)[0]["UserName"]
+#print(myFriends)
 itchat.run()
